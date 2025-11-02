@@ -13,64 +13,60 @@ pub type CircuitCache =
   Dict(String, Int)
 
 pub type Operation {
+  Set(n: String)
   Not(var: String)
   And(var1: String, var2: String)
   Or(var1: String, var2: String)
-  Rshift(var: String, n: Int)
-  Lshift(var: String, n: Int)
-  Set(n: String)
-  OpError
+  Rshift(var1: String, var2: String)
+  Lshift(var1: String, var2: String)
 }
 
-pub type GetCircRes {
-  GetCircRes(value: Int, cache: CircuitCache)
+pub type GetRes {
+  GetRes(value: Int, cache: CircuitCache)
 }
 
 pub fn get_circuit_var(
   circuit: Circuit,
   name: String,
   cache: CircuitCache,
-) -> GetCircRes {
+) -> GetRes {
   let get = fn(name, cache) { get_circuit_var(circuit, name, cache) }
 
   let parsed_name = int.base_parse(name, 10)
-  let GetCircRes(value, cache) = case result.is_ok(parsed_name) {
-    True -> GetCircRes(parsed_name |> unwrap(0), cache)
+  case result.is_ok(parsed_name) {
+    True -> GetRes(parsed_name |> unwrap(0), cache)
     False -> {
       case dict.get(cache, name) {
-        Ok(value) -> GetCircRes(value, cache)
-        Error(_) -> {
-          case dict.get(circuit, name) |> unwrap(OpError) {
-            Not(var) -> {
-              let GetCircRes(value, cache) = get(var, cache)
-              GetCircRes(int.bitwise_not(value), cache)
+        Ok(value) -> GetRes(value, cache)
+        Error(Nil) -> {
+          // will crash if it gets bad data
+          let assert Ok(op) = dict.get(circuit, name)
+
+          let #(value1, value2, cache) = case op {
+            Not(v) | Set(v) -> {
+              let GetRes(value, cache) = get(v, cache)
+              #(value, 0, cache)
             }
-            And(var1, var2) -> {
-              let GetCircRes(value1, cache) = get(var1, cache)
-              let GetCircRes(value2, cache) = get(var2, cache)
-              GetCircRes(int.bitwise_and(value1, value2), cache)
+            And(v1, v2) | Or(v1, v2) | Rshift(v1, v2) | Lshift(v1, v2) -> {
+              let GetRes(value1, cache) = get(v1, cache)
+              let GetRes(value2, cache) = get(v2, cache)
+              #(value1, value2, cache)
             }
-            Or(var1, var2) -> {
-              let GetCircRes(value1, cache) = get(var1, cache)
-              let GetCircRes(value2, cache) = get(var2, cache)
-              GetCircRes(int.bitwise_or(value1, value2), cache)
-            }
-            Rshift(var, n) -> {
-              let GetCircRes(value, cache) = get(var, cache)
-              GetCircRes(int.bitwise_shift_right(value, n), cache)
-            }
-            Lshift(var, n) -> {
-              let GetCircRes(value, cache) = get(var, cache)
-              GetCircRes(int.bitwise_shift_left(value, n), cache)
-            }
-            Set(var) -> get(var, cache)
-            OpError -> GetCircRes(0, cache)
           }
+
+          let res = case op {
+            Set(_) -> value1
+            Not(_) -> int.bitwise_not(value1)
+            And(_, _) -> int.bitwise_and(value1, value2)
+            Or(_, _) -> int.bitwise_or(value1, value2)
+            Rshift(_, _) -> int.bitwise_shift_right(value1, value2)
+            Lshift(_, _) -> int.bitwise_shift_left(value1, value2)
+          }
+          GetRes(res, dict.insert(cache, name, res))
         }
       }
     }
   }
-  GetCircRes(value, dict.insert(cache, name, value))
 }
 
 pub fn main() {
@@ -86,18 +82,10 @@ pub fn main() {
           dict.insert(circ, target, And(var1, var2))
         [var1, "OR", var2, "->", target] ->
           dict.insert(circ, target, Or(var1, var2))
-        [var, "RSHIFT", n, "->", target] ->
-          dict.insert(
-            circ,
-            target,
-            Rshift(var, int.base_parse(n, 10) |> unwrap(0)),
-          )
-        [var, "LSHIFT", n, "->", target] ->
-          dict.insert(
-            circ,
-            target,
-            Lshift(var, int.base_parse(n, 10) |> unwrap(0)),
-          )
+        [var1, "RSHIFT", var2, "->", target] ->
+          dict.insert(circ, target, Rshift(var1, var2))
+        [var1, "LSHIFT", var2, "->", target] ->
+          dict.insert(circ, target, Lshift(var1, var2))
         [v, "->", target] -> dict.insert(circ, target, Set(v))
 
         _ -> circ
@@ -107,11 +95,7 @@ pub fn main() {
   let result_part_1 = get_circuit_var(input, "a", dict.new()).value
   println(result_part_1 |> to_string)
 
-  let result_part_2 =
-    get_circuit_var(
-      dict.insert(input, "b", Set(int.to_string(result_part_1))),
-      "a",
-      dict.new(),
-    ).value
+  let input_part_2 = dict.insert(input, "b", Set(int.to_string(result_part_1)))
+  let result_part_2 = get_circuit_var(input_part_2, "a", dict.new()).value
   println(result_part_2 |> to_string)
 }
