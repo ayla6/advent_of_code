@@ -1,19 +1,20 @@
-import gleam/dynamic/decode
 import gleam/int.{add, min, multiply, to_string}
 import gleam/io.{println}
-import gleam/json
 import gleam/list.{combinations, fold, map, reduce}
 import gleam/result.{unwrap}
-import gleam/string.{trim}
+import gleam/string.{split, trim}
 import simplifile.{read}
 
 pub fn main() {
   let input =
-    read(from: "../input.json")
+    read(from: "../input.txt")
     |> unwrap("")
     |> trim()
-    |> json.parse(decode.list(decode.list(decode.int)))
-    |> unwrap([])
+    |> split("\n")
+    |> map(fn(str) {
+      split(str, "x")
+      |> map(fn(str) { int.base_parse(str, 10) |> unwrap(0) })
+    })
 
   // part 1
   println(

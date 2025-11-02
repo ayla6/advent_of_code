@@ -1,4 +1,7 @@
-const input = (await Bun.file("../input.json").json()) as [
+const input = (await Bun.file("../input.txt").text())
+	.trim()
+	.split("\n")
+	.map((str) => str.split("x").map((str) => Number(str) || 0)) as [
 	number,
 	number,
 	number,
