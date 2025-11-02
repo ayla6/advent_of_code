@@ -48,7 +48,10 @@ pub fn do_action(grid: Grid, action: Action) {
         TurnOff -> False
         TurnOn -> True
       }
-      grid |> dict.insert(loc, value)
+      case value {
+        False -> grid |> dict.delete(loc)
+        True -> grid |> dict.insert(loc, value)
+      }
     })
   })
 }
@@ -75,7 +78,10 @@ pub fn do_action_int(grid: GridInt, action: Action) {
         TurnOff -> int.max(0, cur - 1)
         TurnOn -> int.max(0, cur + 1)
       }
-      grid |> dict.insert(loc, value)
+      case value > 0 {
+        False -> grid |> dict.delete(loc)
+        True -> grid |> dict.insert(loc, value)
+      }
     })
   })
 }
