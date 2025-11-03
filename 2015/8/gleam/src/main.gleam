@@ -6,13 +6,11 @@ import gleam/string.{split, trim}
 import simplifile.{read}
 
 pub fn get_mem_size(str, cur_size, i) {
-  let rec = fn(i, extend) { get_mem_size(str, cur_size + 1, i + extend) }
-
   case string.slice(str, i, 2) {
     "" -> cur_size
-    "\\\\" | "\\\"" -> rec(i + 1, 1)
-    "\\x" -> rec(i + 1, 3)
-    _ -> rec(i, 1)
+    "\\\\" | "\\\"" -> get_mem_size(str, cur_size + 1, i + 2)
+    "\\x" -> get_mem_size(str, cur_size + 1, i + 4)
+    _ -> get_mem_size(str, cur_size + 1, i + 1)
   }
 }
 
@@ -21,13 +19,11 @@ pub fn get_mem_size_helper(str: String) {
 }
 
 pub fn get_encoded_size(str, cur_size, i) {
-  let rec = fn(next_size) { get_encoded_size(str, next_size, i + 1) }
-
   let char = string.slice(str, i, 1)
   case char {
     "" -> cur_size + 2
-    "\\" | "\"" -> rec(cur_size + 2)
-    _ -> rec(cur_size + 1)
+    "\\" | "\"" -> get_encoded_size(str, cur_size + 2, i + 1)
+    _ -> get_encoded_size(str, cur_size + 1, i + 1)
   }
 }
 
