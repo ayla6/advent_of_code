@@ -11,5 +11,8 @@ pkgs.mkShellNoCC {
     gleam
     beam28Packages.erlang
     beam28Packages.rebar3
+
+    hyperfine
+    fish
   ];
 }
