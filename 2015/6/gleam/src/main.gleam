@@ -98,8 +98,7 @@ pub fn main() {
     |> trim()
     |> split("\n")
     |> list.map(fn(v) {
-      let split_v = split(v, " ")
-      case split_v {
+      case split(v, " ") {
         ["toggle", loc1, _, loc2] ->
           Action(Toggle, str_to_loc(loc1), str_to_loc(loc2))
         ["turn", "off", loc1, _, loc2] ->
