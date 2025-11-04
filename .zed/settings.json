@@ -1,1 +1,1 @@
-{ "disable_ai": true, "edit_predictions": { "disabled_globs": ["*"] } }
+{ "disable_ai": true, "edit_predictions": { "disabled_globs": ["*"] }, "agent": {"enabled": false, "button": false}, "inline_code_actions": false }
