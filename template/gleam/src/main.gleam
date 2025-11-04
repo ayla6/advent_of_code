@@ -1,11 +1,12 @@
 import gleam/int.{to_string}
 import gleam/io.{println}
-import gleam/result.{unwrap}
-import gleam/string.{trim}
-import simplifile.{read}
+import gleam/string
+import simplifile.{read as read_file}
 
 pub fn main() {
-  let input = read(from: "../input.txt") |> unwrap("") |> trim()
+  let assert Ok(input) = read_file(from: "../input.txt")
+    as "Input file not found"
+  let input = input |> string.trim
 
   println(
     5
