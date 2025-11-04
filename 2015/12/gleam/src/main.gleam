@@ -29,21 +29,14 @@ fn get_total_number(data: Nested, no_red no_red) {
       items
       |> list.fold(0, fn(acc, data) { acc + get_total_number(data, no_red) })
     NestedDict(items) -> {
-      let has_red =
-        no_red
-        && {
-          items
-          |> dict.values
-          |> list.any(fn(data) { data == StringValue("red") })
+      items
+      |> dict.values
+      |> list.fold_until(0, fn(acc, data) {
+        case no_red && data == StringValue("red") {
+          False -> list.Continue(acc + get_total_number(data, no_red))
+          True -> list.Stop(0)
         }
-      case has_red {
-        True -> 0
-        False ->
-          items
-          |> dict.fold(0, fn(acc, _, data) {
-            acc + get_total_number(data, no_red)
-          })
-      }
+      })
     }
     IntValue(v) -> v
     _ -> 0
