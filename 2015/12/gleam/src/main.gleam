@@ -23,38 +23,35 @@ fn int_anywhere_decoder() -> decode.Decoder(Nested) {
   ])
 }
 
-fn handle_calc(data: Nested, no_red) {
+fn get_total_number(data: Nested, no_red no_red) {
   case data {
-    NestedList(items) -> get_total_number_list(items, no_red)
-    NestedDict(items) -> get_total_number_dict(items, no_red)
+    NestedList(items) ->
+      items
+      |> list.fold(0, fn(acc, data) { acc + get_total_number(data, no_red) })
+    NestedDict(items) -> {
+      let has_red = case no_red {
+        True ->
+          items
+          |> dict.fold(False, fn(state, _, data) {
+            case data {
+              StringValue("red") -> True
+              _ -> state
+            }
+          })
+        False -> False
+      }
+      case has_red {
+        True -> 0
+        False ->
+          items
+          |> dict.fold(0, fn(acc, _, data) {
+            acc + get_total_number(data, no_red)
+          })
+      }
+    }
     IntValue(v) -> v
     _ -> 0
   }
-}
-
-fn get_total_number_dict(data: Dict(String, Nested), no_red) {
-  let has_red = case no_red {
-    True ->
-      data
-      |> dict.fold(False, fn(state, _, data) {
-        case data {
-          StringValue("red") -> True
-          _ -> state
-        }
-      })
-    False -> False
-  }
-  case has_red {
-    True -> 0
-    False ->
-      data
-      |> dict.fold(0, fn(acc, _, data) { acc + handle_calc(data, no_red) })
-  }
-}
-
-fn get_total_number_list(data: List(Nested), no_red no_red) {
-  data
-  |> list.fold(0, fn(acc, data) { acc + handle_calc(data, no_red) })
 }
 
 pub fn main() {
@@ -64,11 +61,11 @@ pub fn main() {
     |> json.parse(int_anywhere_decoder())
 
   println(
-    get_total_number_list([input], no_red: False)
+    get_total_number(input, no_red: False)
     |> to_string,
   )
   println(
-    get_total_number_list([input], no_red: True)
+    get_total_number(input, no_red: True)
     |> to_string,
   )
 }
