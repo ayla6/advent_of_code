@@ -1,12 +1,10 @@
 import gleam/dict.{type Dict}
-import gleam/dynamic
 import gleam/dynamic/decode
 import gleam/int.{to_string}
 import gleam/io.{println}
 import gleam/json
 import gleam/list
 import gleam/result.{unwrap}
-import gleam/string.{trim}
 import simplifile.{read}
 
 type Nested {
@@ -25,68 +23,38 @@ fn int_anywhere_decoder() -> decode.Decoder(Nested) {
   ])
 }
 
-fn get_total_number_dict(data: Dict(String, Nested)) {
-  data
-  |> dict.fold(0, fn(acc, _, data) {
-    let add = case data {
-      NestedList(items) -> get_total_number_list(items)
-      NestedDict(items) -> get_total_number_dict(items)
-      IntValue(v) -> v
-      _ -> 0
-    }
-    acc + add
-  })
+fn handle_calc(data: Nested, no_red) {
+  case data {
+    NestedList(items) -> get_total_number_list(items, no_red)
+    NestedDict(items) -> get_total_number_dict(items, no_red)
+    IntValue(v) -> v
+    _ -> 0
+  }
 }
 
-fn get_total_number_list(data: List(Nested)) {
-  data
-  |> list.fold(0, fn(acc, data) {
-    let add = case data {
-      NestedList(items) -> get_total_number_list(items)
-      NestedDict(items) -> get_total_number_dict(items)
-      IntValue(v) -> v
-      _ -> 0
-    }
-    acc + add
-  })
-}
-
-fn get_total_number_dict_no_red(data: Dict(String, Nested)) {
-  let has_red =
-    data
-    |> dict.fold(False, fn(state, _, data) {
-      case data {
-        StringValue("red") -> True
-        _ -> state
-      }
-    })
+fn get_total_number_dict(data: Dict(String, Nested), no_red) {
+  let has_red = case no_red {
+    True ->
+      data
+      |> dict.fold(False, fn(state, _, data) {
+        case data {
+          StringValue("red") -> True
+          _ -> state
+        }
+      })
+    False -> False
+  }
   case has_red {
     True -> 0
     False ->
       data
-      |> dict.fold(0, fn(acc, _, data) {
-        let add = case data {
-          NestedList(items) -> get_total_number_list_no_red(items)
-          NestedDict(items) -> get_total_number_dict_no_red(items)
-          IntValue(v) -> v
-          _ -> 0
-        }
-        acc + add
-      })
+      |> dict.fold(0, fn(acc, _, data) { acc + handle_calc(data, no_red) })
   }
 }
 
-fn get_total_number_list_no_red(data: List(Nested)) {
+fn get_total_number_list(data: List(Nested), no_red no_red) {
   data
-  |> list.fold(0, fn(acc, data) {
-    let add = case data {
-      NestedList(items) -> get_total_number_list_no_red(items)
-      NestedDict(items) -> get_total_number_dict_no_red(items)
-      IntValue(v) -> v
-      _ -> 0
-    }
-    acc + add
-  })
+  |> list.fold(0, fn(acc, data) { acc + handle_calc(data, no_red) })
 }
 
 pub fn main() {
@@ -96,11 +64,11 @@ pub fn main() {
     |> json.parse(int_anywhere_decoder())
 
   println(
-    get_total_number_list([input])
+    get_total_number_list([input], no_red: False)
     |> to_string,
   )
   println(
-    get_total_number_list_no_red([input])
+    get_total_number_list([input], no_red: True)
     |> to_string,
   )
 }
