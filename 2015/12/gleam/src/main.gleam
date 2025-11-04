@@ -14,11 +14,11 @@ type Nested {
   StringValue(String)
 }
 
-fn int_anywhere_decoder() -> decode.Decoder(Nested) {
+fn nested_decoder() -> decode.Decoder(Nested) {
   use <- decode.recursive
   decode.one_of(decode.int |> decode.map(IntValue), or: [
-    decode.list(int_anywhere_decoder()) |> decode.map(NestedList),
-    decode.dict(decode.string, int_anywhere_decoder()) |> decode.map(NestedDict),
+    decode.list(nested_decoder()) |> decode.map(NestedList),
+    decode.dict(decode.string, nested_decoder()) |> decode.map(NestedDict),
     decode.string |> decode.map(StringValue),
   ])
 }
@@ -29,17 +29,13 @@ fn get_total_number(data: Nested, no_red no_red) {
       items
       |> list.fold(0, fn(acc, data) { acc + get_total_number(data, no_red) })
     NestedDict(items) -> {
-      let has_red = case no_red {
-        True ->
+      let has_red =
+        no_red
+        && {
           items
-          |> dict.fold(False, fn(state, _, data) {
-            case data {
-              StringValue("red") -> True
-              _ -> state
-            }
-          })
-        False -> False
-      }
+          |> dict.values
+          |> list.any(fn(data) { data == StringValue("red") })
+        }
       case has_red {
         True -> 0
         False ->
@@ -58,7 +54,7 @@ pub fn main() {
   let assert Ok(input) =
     read(from: "../input.json")
     |> unwrap("")
-    |> json.parse(int_anywhere_decoder())
+    |> json.parse(nested_decoder())
 
   println(
     get_total_number(input, no_red: False)
