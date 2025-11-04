@@ -23,6 +23,7 @@ fn nested_decoder() -> decode.Decoder(Nested) {
   ])
 }
 
+// unfortunately this isn't tail call optimised. making it so would make it ugly :(
 fn get_total_number(data: Nested, no_red no_red) {
   case data {
     NestedList(items) ->
