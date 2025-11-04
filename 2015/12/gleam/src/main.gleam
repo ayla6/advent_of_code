@@ -32,9 +32,9 @@ fn get_total_number(data: Nested, no_red no_red) {
       items
       |> dict.values
       |> list.fold_until(0, fn(acc, data) {
-        case no_red && data == StringValue("red") {
-          False -> list.Continue(acc + get_total_number(data, no_red))
-          True -> list.Stop(0)
+        case no_red, data {
+          True, StringValue("red") -> list.Stop(0)
+          _, _ -> list.Continue(acc + get_total_number(data, no_red))
         }
       })
     }
