@@ -33,7 +33,6 @@ pub type Sign {
 fn do_find_happiest_table(
   happiness_dict,
   people,
-  happiest_table,
   first_person first_person,
   last_person last_person,
   table table,
@@ -43,11 +42,7 @@ fn do_find_happiest_table(
       let assert Ok(relation) =
         happiness_dict |> dict.get(Relation(last_person, first_person))
         as "There should be more than one person"
-      let table = table + relation
-      case table > happiest_table {
-        True -> table
-        False -> happiest_table
-      }
+      table + relation
     }
     False -> {
       people
@@ -64,7 +59,6 @@ fn do_find_happiest_table(
           do_find_happiest_table(
             happiness_dict,
             people |> set.delete(person),
-            happiest_table,
             first_person,
             last_person: person,
             table: table + relation,
@@ -84,7 +78,6 @@ pub fn find_happiest_table(happiness_dict: HappinessDict, people: People) {
   do_find_happiest_table(
     happiness_dict,
     people |> set.delete(person),
-    0,
     first_person: person,
     last_person: person,
     table: 0,
