@@ -59,6 +59,7 @@ fn do_find_happiest_table(
             <> { last_person <> " and " <> person }
             <> " was not found"
           }
+        // gonna be honest i have no idea why this part works i feel ashamed
         let table =
           table
           + relation
