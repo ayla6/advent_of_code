@@ -59,17 +59,15 @@ fn do_find_happiest_table(
             <> { last_person <> " and " <> person }
             <> " was not found"
           }
-        // gonna be honest i have no idea why this part works i feel ashamed
+        // ok so i figured out why this works, it's because it's only comparing to stuff that starts at the same level
         let table =
-          table
-          + relation
-          + do_find_happiest_table(
+          do_find_happiest_table(
             happiness_dict,
             people |> set.delete(person),
             happiest_table,
             first_person,
             last_person: person,
-            table: table,
+            table: table + relation,
           )
         case table > happiest_table {
           True -> table
@@ -167,7 +165,7 @@ pub fn main() {
   happiest_table |> int.to_string |> io.println
 
   "Part 2" |> io.println
-  let relations_with_me: SingularHappinessDict =
+  let relations_with_me: HappinessDict =
     people
     |> set.to_list
     |> list.map(fn(person) {
