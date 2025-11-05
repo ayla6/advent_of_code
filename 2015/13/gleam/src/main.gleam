@@ -10,17 +10,11 @@ pub type Relation {
   Relation(person: String, neighbor: String)
 }
 
-pub type SingularHappiness =
-  Int
-
 pub type SingularHappinessDict =
-  Dict(Relation, SingularHappiness)
-
-pub type Happiness =
-  Int
+  Dict(Relation, Int)
 
 pub type HappinessDict =
-  Dict(Relation, Happiness)
+  Dict(Relation, Int)
 
 pub type People =
   Set(String)
@@ -37,7 +31,7 @@ fn do_find_happiest_table(
   last_person last_person,
   table table,
 ) {
-  case set.size(people) == 0 {
+  case people |> set.is_empty {
     True -> {
       let assert Ok(relation) =
         happiness_dict |> dict.get(Relation(last_person, first_person))
@@ -170,6 +164,5 @@ pub fn main() {
   let people = people |> set.insert("Me")
 
   let happiest_table_with_me = find_happiest_table(happiness_dict, people)
-  "With me: " |> io.print
   happiest_table_with_me |> int.to_string |> io.println
 }
