@@ -14,11 +14,13 @@ defmodule Main do
   |> IO.puts()
 
   input
-  |> Enum.reduce_while({0, 0}, fn step, floor ->
-    i = elem(floor, 0) + 1
+  |> Enum.reduce_while({0, 0}, fn step, i_floor ->
+    {i, floor} = i_floor
+
+    i = i + 1
 
     floor =
-      elem(floor, 1) +
+      floor +
         case step do
           "(" -> 1
           ")" -> -1
