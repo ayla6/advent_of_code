@@ -1,53 +1,51 @@
-import gleam/int.{add, min, multiply, to_string}
-import gleam/io.{println}
-import gleam/list.{combinations, fold, map, reduce}
-import gleam/result.{unwrap}
-import gleam/string.{split, trim}
-import simplifile.{read}
+import gleam/int
+import gleam/io
+import gleam/list
+import gleam/result
+import gleam/string
+import simplifile as file
 
 pub fn main() {
   let input =
-    read(from: "../input.txt")
-    |> unwrap("")
-    |> trim()
-    |> split("\n")
-    |> map(fn(str) {
-      split(str, "x")
-      |> map(fn(str) { int.base_parse(str, 10) |> unwrap(0) })
+    file.read(from: "../input.txt")
+    |> result.unwrap("")
+    |> string.trim
+    |> string.split("\n")
+    |> list.map(fn(str) {
+      string.split(str, "x")
+      |> list.map(fn(str) { int.base_parse(str, 10) |> result.unwrap(0) })
     })
 
   // part 1
-  println(
-    input
-    |> fold(0, fn(prev, cur) {
-      let sides =
-        cur
-        |> combinations(2)
-        |> map(fn(v) { fold(v, 1, multiply) })
+  input
+  |> list.fold(0, fn(prev, cur) {
+    let sides =
+      cur
+      |> list.combinations(2)
+      |> list.map(fn(v) { list.fold(v, 1, int.multiply) })
 
-      prev
-      + fold(sides, 0, fn(prev, cur) { prev + 2 * cur })
-      + { reduce(sides, min) |> unwrap(0) }
-    })
-    |> to_string,
-  )
+    prev
+    + list.fold(sides, 0, fn(prev, cur) { prev + 2 * cur })
+    + { list.reduce(sides, int.min) |> result.unwrap(0) }
+  })
+  |> int.to_string
+  |> io.println
 
   // part 2
-  println(
-    input
-    |> fold(0, fn(prev, cur) {
-      let smallest_perimeter =
-        reduce(
-          cur
-            |> map(fn(v) { multiply(v, 2) })
-            |> combinations(2)
-            |> map(fn(v) { fold(v, 0, add) }),
-          min,
-        )
-        |> unwrap(0)
+  input
+  |> list.fold(0, fn(prev, cur) {
+    let smallest_perimeter =
+      list.reduce(
+        cur
+          |> list.map(fn(v) { v |> int.multiply(2) })
+          |> list.combinations(2)
+          |> list.map(fn(v) { list.fold(v, 0, int.add) }),
+        int.min,
+      )
+      |> result.unwrap(0)
 
-      prev + smallest_perimeter + fold(cur, 1, multiply)
-    })
-    |> to_string,
-  )
+    prev + smallest_perimeter + list.fold(cur, 1, int.multiply)
+  })
+  |> int.to_string
+  |> io.println
 }
