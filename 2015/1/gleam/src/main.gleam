@@ -1,45 +1,44 @@
-import gleam/int.{to_string}
-import gleam/io.{println}
-import gleam/list.{Continue, Stop, fold, fold_until}
-import gleam/result.{unwrap}
-import gleam/string.{split, trim}
-import simplifile.{read}
+import gleam/int
+import gleam/io
+import gleam/list.{Continue, Stop, fold}
+import gleam/string
+import simplifile as file
 
 pub type FloorIndex {
   FloorIndex(floor: Int, index: Int)
 }
 
 pub fn main() {
-  let input = read(from: "../input.txt") |> unwrap("") |> trim() |> split("")
+  let assert Ok(input) = file.read(from: "../input.txt")
+  let input = input |> string.trim() |> string.split("")
 
-  // part 1 - get final floor
-  println(
-    fold(input, 0, fn(fl, cur) {
-      case cur {
-        "(" -> fl + 1
-        ")" -> fl - 1
-        ___ -> 0
-      }
-    })
-    |> to_string,
-  )
+  input
+  |> fold(0, fn(fl, cur) {
+    case cur {
+      "(" -> fl + 1
+      ")" -> fl - 1
+      ___ -> 0
+    }
+  })
+  |> int.to_string
+  |> io.println
 
   // part 2 - get first time in the basement
-  println(
-    {
-      input
-      |> fold_until(FloorIndex(0, 1), fn(fi, cur) {
-        let new = case cur {
-          "(" -> fi.floor + 1
-          ")" -> fi.floor - 1
-          ___ -> 0
-        }
-        case new < 0 {
-          True -> Stop(FloorIndex(new, fi.index))
-          False -> Continue(FloorIndex(new, fi.index + 1))
-        }
-      })
-    }.index
-    |> to_string,
-  )
+  let FloorIndex(_, index) =
+    input
+    |> list.fold_until(FloorIndex(0, 1), fn(fi, cur) {
+      let new = case cur {
+        "(" -> fi.floor + 1
+        ")" -> fi.floor - 1
+        ___ -> 0
+      }
+      case new < 0 {
+        True -> Stop(FloorIndex(new, fi.index))
+        False -> Continue(FloorIndex(new, fi.index + 1))
+      }
+    })
+
+  index
+  |> int.to_string
+  |> io.println
 }
