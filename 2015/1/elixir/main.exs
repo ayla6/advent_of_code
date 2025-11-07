@@ -20,11 +20,10 @@ defmodule Main do
     i = i + 1
 
     floor =
-      floor +
-        case step do
-          "(" -> 1
-          ")" -> -1
-        end
+      case step do
+        "(" -> 1
+        ")" -> -1
+      end + floor
 
     case floor do
       -1 -> {:halt, {i, floor}}
