@@ -25,9 +25,8 @@ pub type LeadKm {
   LeadKm(km: Int, leads: Set(String))
 }
 
-pub type RunState {
-  RunState(lead_km: LeadKm, state: Dict(String, ReindeerState))
-}
+pub type RunState =
+  Dict(String, ReindeerState)
 
 pub fn to_int(number_string) {
   let assert Ok(number) = number_string |> int.base_parse(10)
@@ -39,10 +38,10 @@ pub fn do_calculate_run_state(state: RunState, reindeers: List(Reindeer), sec) {
   case sec > 0 {
     False -> state
     True -> {
-      let RunState(LeadKm(_, leads), state) =
+      let #(LeadKm(_, leads), state) =
         reindeers
-        |> list.fold(state, fn(s, reindeer) {
-          let RunState(lead_km, state) = s
+        |> list.fold(#(LeadKm(0, set.new()), state), fn(s, reindeer) {
+          let #(lead, state) = s
           let Reindeer(name, speed, run, rest) = reindeer
           let ReindeerState(points, km, action, time_until_change) =
             state
@@ -61,44 +60,37 @@ pub fn do_calculate_run_state(state: RunState, reindeers: List(Reindeer), sec) {
             }
             |> dict.insert(state, name, _)
 
-          let lead_km = case int.compare(km, lead_km.km) {
-            Eq -> LeadKm(km, lead_km.leads |> set.insert(name))
+          let lead = case int.compare(km, lead.km) {
+            Eq -> LeadKm(km, lead.leads |> set.insert(name))
             Gt -> LeadKm(km, set.new() |> set.insert(name))
-            Lt -> lead_km
+            Lt -> lead
           }
 
-          RunState(lead_km, state)
+          #(lead, state)
         })
 
-      let state =
-        leads
-        |> set.fold(state, fn(state, reindeer_name) {
-          let assert Ok(ReindeerState(points, km, action, time_until_change)) =
-            state
-            |> dict.get(reindeer_name)
+      leads
+      |> set.fold(state, fn(state, reindeer_name) {
+        let assert Ok(ReindeerState(points, km, action, time_until_change)) =
           state
-          |> dict.insert(
-            reindeer_name,
-            ReindeerState(points + 1, km, action, time_until_change),
-          )
-        })
-
-      RunState(LeadKm(0, set.new()), state)
+          |> dict.get(reindeer_name)
+        state
+        |> dict.insert(
+          reindeer_name,
+          ReindeerState(points + 1, km, action, time_until_change),
+        )
+      })
       |> do_calculate_run_state(reindeers, sec - 1)
     }
   }
 }
 
 pub fn calculate_run_state(reindeers: List(Reindeer), sec: Int) {
-  do_calculate_run_state(
-    RunState(LeadKm(0, set.new()), dict.new()),
-    reindeers,
-    sec,
-  )
+  do_calculate_run_state(dict.new(), reindeers, sec)
 }
 
 pub fn get_winner_km(state: RunState) {
-  state.state
+  state
   |> dict.fold(0, fn(winner, _, state) {
     case state.km > winner {
       True -> state.km
@@ -108,7 +100,7 @@ pub fn get_winner_km(state: RunState) {
 }
 
 pub fn get_winner_points(state: RunState) {
-  state.state
+  state
   |> dict.fold(0, fn(winner, _, state) {
     case state.points > winner {
       True -> state.points
