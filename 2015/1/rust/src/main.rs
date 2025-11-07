@@ -1,10 +1,7 @@
 use std::{fs, ops::ControlFlow};
 
 fn main() {
-    let input: String = match fs::read_to_string("../input.txt") {
-        Ok(input) => input,
-        _ => panic!("invalid input!!!"),
-    };
+    let input = fs::read_to_string("../input.txt").expect("invalid input");
     let input = input.trim();
 
     let part1 = input.chars().fold(0, |floor, v| {
@@ -15,10 +12,9 @@ fn main() {
         }) + floor
     });
 
-    println!("{}", part1.to_string());
+    println!("{}", part1);
 
-    let part2 = input.chars().try_fold((0, 1), |state, v| {
-        let (floor, step) = state;
+    let part2 = input.chars().try_fold((0, 1), |(floor, step), v| {
         let floor = (match v {
             '(' => 1,
             ')' => -1,
@@ -31,8 +27,8 @@ fn main() {
     });
     let part2 = match part2 {
         ControlFlow::Break(part2) => part2,
-        _ => panic!("something bad happened"),
+        ControlFlow::Continue(_) => panic!("bad input. never reached basement"),
     };
 
-    println!("{}", part2.to_string());
+    println!("{}", part2);
 }
