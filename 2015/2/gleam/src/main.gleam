@@ -18,14 +18,14 @@ pub fn main() {
 
   // part 1
   input
-  |> list.fold(0, fn(prev, cur) {
+  |> list.fold(0, fn(acc, cur) {
     let sides =
       cur
       |> list.combinations(2)
       |> list.map(fn(v) { list.fold(v, 1, int.multiply) })
 
-    prev
-    + list.fold(sides, 0, fn(prev, cur) { prev + 2 * cur })
+    acc
+    + { list.fold(sides, 0, int.add) |> int.multiply(2) }
     + { list.reduce(sides, int.min) |> result.unwrap(0) }
   })
   |> int.to_string
@@ -33,18 +33,16 @@ pub fn main() {
 
   // part 2
   input
-  |> list.fold(0, fn(prev, cur) {
+  |> list.fold(0, fn(acc, cur) {
     let smallest_perimeter =
-      list.reduce(
-        cur
-          |> list.map(fn(v) { v |> int.multiply(2) })
-          |> list.combinations(2)
-          |> list.map(fn(v) { list.fold(v, 0, int.add) }),
-        int.min,
-      )
+      cur
+      |> list.map(fn(v) { v |> int.multiply(2) })
+      |> list.combinations(2)
+      |> list.map(fn(v) { list.fold(v, 0, int.add) })
+      |> list.reduce(int.min)
       |> result.unwrap(0)
 
-    prev + smallest_perimeter + list.fold(cur, 1, int.multiply)
+    acc + smallest_perimeter + list.fold(cur, 1, int.multiply)
   })
   |> int.to_string
   |> io.println

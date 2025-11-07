@@ -14,17 +14,17 @@ defmodule Main do
   |> Enum.reduce(0, fn v, acc ->
     [l, w, h] = v
     sides = [l * w, w * h, h * l]
-    smallest = sides |> Enum.reduce(fn a, b -> min(a, b) end)
-    (sides |> Enum.sum()) * 2 + smallest + acc
+    acc + Enum.sum(sides) * 2 + Enum.min(sides)
   end)
   |> IO.puts()
 
   input
-  |> Enum.reduce(0, fn v, acc ->
-    [l, w, h] = v
+  |> Enum.reduce(0, fn measure, acc ->
+    [l, w, h] = measure
     half_perimeter = [l + w, w + h, h + l]
-    smallest_half_perimeter = half_perimeter |> Enum.reduce(fn a, b -> min(a, b) end)
-    l * w * h + smallest_half_perimeter * 2 + acc
+
+    acc + Enum.reduce(measure, fn a, b -> a * b end) +
+      Enum.min(half_perimeter) * 2
   end)
   |> IO.puts()
 end
