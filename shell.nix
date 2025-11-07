@@ -12,6 +12,8 @@ pkgs.mkShellNoCC {
     beam28Packages.erlang
     beam28Packages.rebar3
 
+    elixir
+
     hyperfine
     fish
   ];
