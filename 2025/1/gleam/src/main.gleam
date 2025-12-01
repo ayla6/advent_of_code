@@ -5,15 +5,6 @@ import gleam/result
 import gleam/string
 import simplifile as file
 
-pub type Direction {
-  Left
-  Right
-}
-
-pub type InputEntry {
-  InputEntry(direction: Direction, turn: Int)
-}
-
 pub type RotationState {
   RotationState(number: Int, zeroes: Int)
 }
@@ -26,37 +17,24 @@ pub fn main() {
     |> string.trim
     |> string.split("\n")
     |> list.map(fn(l) {
-      let #(direction, turn) = case l {
-        "R" <> turn -> #(Right, turn)
-        "L" <> turn -> #(Left, turn)
+      case l {
+        "R" <> turn -> turn |> int.parse |> result.unwrap(0)
+        "L" <> turn -> 0 - { turn |> int.parse |> result.unwrap(0) }
         _ -> panic as "bad input"
       }
-      InputEntry(direction, turn |> int.parse |> result.unwrap(0))
     })
 
   let part1 =
     input
     |> list.fold(RotationState(50, 0), fn(acc, v) {
       let new_number =
-        int.modulo(
-          acc.number
-            + case v.direction {
-            Right -> v.turn
-            Left -> -v.turn
-          },
-          100,
-        )
+        int.modulo(acc.number + v, 100)
         |> result.unwrap(0)
-      RotationState(
-        new_number,
-        acc.zeroes
-          + case new_number {
-          0 -> 1
-          _ -> 0
-        },
-      )
+      RotationState(new_number, case new_number {
+        0 -> acc.zeroes + 1
+        _ -> acc.zeroes
+      })
     })
-
   part1.zeroes
   |> int.to_string
   |> io.println
@@ -64,23 +42,15 @@ pub fn main() {
   let part2 =
     input
     |> list.fold(RotationState(50, 0), fn(acc, v) {
-      let raw_new_number =
-        acc.number
-        + case v.direction {
-          Right -> v.turn
-          Left -> -v.turn
-        }
-      // took too long to remember that abs isn't this im so fucking stupid
+      let raw_new_number = acc.number + v
       let new_number = int.modulo(raw_new_number, 100) |> result.unwrap(0)
-      // dumbest fuck in the world??? theres gotta be a mathy way of doing this
-      let times_it_went_zero =
-        list.range(acc.number, raw_new_number)
-        |> list.fold(0, fn(acc2, i) {
-          case i % 100 {
-            0 if i != acc.number -> acc2 + 1
-            _ -> acc2
-          }
-        })
+      let times_it_went_zero = {
+        let value = int.absolute_value(raw_new_number / 100)
+        case acc.number != 0, raw_new_number > 0 {
+          True, False -> value + 1
+          _, _ -> value
+        }
+      }
       RotationState(new_number, acc.zeroes + times_it_went_zero)
     })
 
