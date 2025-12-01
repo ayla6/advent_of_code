@@ -47,7 +47,8 @@ pub fn main() {
       let zeroes =
         acc.zeroes
         + case raw_new_number <= 0 && acc.number != 0 {
-          // if it is below zero before being moduloed and the original number itself wasn't zero it means that it did touch zero but the division thing wouldn't count it, so we give this extra support
+          // if it is below zero before being moduloed and the original number itself wasn't zero it means that it did touch zero but the division thing wouldn't count it, so we give this extra support.
+          // of course, there is no need to deal with a negative to positive situation because the acc number will never be negative!!!
           True -> raw_zeroes + 1
           False -> raw_zeroes
         }
