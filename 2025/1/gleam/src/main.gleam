@@ -19,7 +19,7 @@ pub fn main() {
     |> list.map(fn(l) {
       case l {
         "R" <> turn -> turn |> int.parse |> result.unwrap(0)
-        "L" <> turn -> 0 - { turn |> int.parse |> result.unwrap(0) }
+        "L" <> turn -> -{ turn |> int.parse |> result.unwrap(0) }
         _ -> panic as "bad input"
       }
     })
@@ -43,17 +43,16 @@ pub fn main() {
     input
     |> list.fold(RotationState(50, 0), fn(acc, v) {
       let raw_new_number = acc.number + v
-      let new_number = int.modulo(raw_new_number, 100) |> result.unwrap(0)
-      let times_it_went_zero = {
-        let value = int.absolute_value(raw_new_number / 100)
-        case acc.number != 0, raw_new_number > 0 {
-          True, False -> value + 1
-          _, _ -> value
+      let raw_zeroes = int.absolute_value(raw_new_number / 100)
+      let zeroes =
+        acc.zeroes
+        + case raw_new_number <= 0 && acc.number != 0 {
+          // if it is below zero before being moduloed and the original number itself wasn't zero it means that it did touch zero but the division thing wouldn't count it, so we give this extra support
+          True -> raw_zeroes + 1
+          False -> raw_zeroes
         }
-      }
-      RotationState(new_number, acc.zeroes + times_it_went_zero)
+      RotationState(int.modulo(raw_new_number, 100) |> result.unwrap(0), zeroes)
     })
-
   part2.zeroes
   |> int.to_string
   |> io.println
