@@ -1,6 +1,7 @@
 import gleam/int
 import gleam/io
 import gleam/list
+import gleam/result
 import gleam/string
 import simplifile as file
 
@@ -25,28 +26,27 @@ pub fn main() {
     |> string.trim
     |> string.split("\n")
     |> list.map(fn(l) {
-      let assert Ok(direction_letter) = string.first(l)
-      let direction = case direction_letter {
-        "R" -> Right
-        "L" -> Left
+      let #(direction, turn) = case l {
+        "R" <> turn -> #(Right, turn)
+        "L" <> turn -> #(Left, turn)
         _ -> panic as "bad input"
       }
-      let assert Ok(turn) = string.drop_start(l, 1) |> int.parse
-      InputEntry(direction, turn)
+      InputEntry(direction, turn |> int.parse |> result.unwrap(0))
     })
 
   let part1 =
     input
     |> list.fold(RotationState(50, 0), fn(acc, v) {
       let new_number =
-        {
+        int.modulo(
           acc.number
-          + case v.direction {
+            + case v.direction {
             Right -> v.turn
             Left -> -v.turn
-          }
-        }
-        % 100
+          },
+          100,
+        )
+        |> result.unwrap(0)
       RotationState(
         new_number,
         acc.zeroes
@@ -71,12 +71,7 @@ pub fn main() {
           Left -> -v.turn
         }
       // took too long to remember that abs isn't this im so fucking stupid
-      let new_number = raw_new_number % 100
-      // this seems to be useless here but i might be a genius who put it preventively
-      let new_number = case new_number > 0 {
-        True -> new_number
-        False -> 100 + new_number
-      }
+      let new_number = int.modulo(raw_new_number, 100) |> result.unwrap(0)
       // dumbest fuck in the world??? theres gotta be a mathy way of doing this
       let times_it_went_zero =
         list.range(acc.number, raw_new_number)
