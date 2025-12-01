@@ -47,10 +47,6 @@ pub fn main() {
           }
         }
         % 100
-      let new_number = case new_number > 0 {
-        True -> new_number
-        False -> 100 + new_number
-      }
       RotationState(
         new_number,
         acc.zeroes
@@ -68,13 +64,12 @@ pub fn main() {
   let part2 =
     input
     |> list.fold(RotationState(50, 0), fn(acc, v) {
-      let raw_new_number = {
+      let raw_new_number =
         acc.number
         + case v.direction {
           Right -> v.turn
           Left -> -v.turn
         }
-      }
       // took too long to remember that abs isn't this im so fucking stupid
       let new_number = raw_new_number % 100
       let new_number = case new_number > 0 {
@@ -90,7 +85,6 @@ pub fn main() {
             _ -> acc2
           }
         })
-      echo #(acc.number, raw_new_number, times_it_went_zero)
       RotationState(new_number, acc.zeroes + times_it_went_zero)
     })
 
