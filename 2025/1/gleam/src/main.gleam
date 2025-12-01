@@ -72,6 +72,7 @@ pub fn main() {
         }
       // took too long to remember that abs isn't this im so fucking stupid
       let new_number = raw_new_number % 100
+      // this seems to be useless here but i might be a genius who put it preventively
       let new_number = case new_number > 0 {
         True -> new_number
         False -> 100 + new_number
