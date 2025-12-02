@@ -4,8 +4,7 @@ struct Range {
 }
 
 fn main() {
-    let input: Vec<Range> = std::fs::read_to_string("../input.txt")
-        .expect("invalid input!!")
+    let input: Vec<Range> = include_str!("../../input.txt")
         .trim()
         .split(",")
         .map(|v| {
