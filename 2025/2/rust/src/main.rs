@@ -61,12 +61,8 @@ fn main() {
     }
     let part_2_invalid = part_2_invalid;
 
-    let input_iter = input.iter();
     let part_2 = part_2_invalid.iter().fold(0, |acc, number| {
-        if input_iter
-            .clone()
-            .any(|r| *number >= r.start && *number <= r.end)
-        {
+        if input.iter().any(|r| *number >= r.start && *number <= r.end) {
             acc + number
         } else {
             acc
