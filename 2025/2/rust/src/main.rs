@@ -19,16 +19,18 @@ fn main() {
         })
         .collect();
 
+    let powers_of_ten: Vec<u64> = (0..10).map(|i| 10_u64.pow(i)).collect();
+
     let part_1 = &input.iter().fold(0_u64, |acc, v| {
         (v.start..=v.end).fold(acc, |acc, n| {
             if n <= 10 {
                 return acc;
             }
-            let len = n.ilog10() + 1;
+            let len = (n.ilog10() + 1) as usize;
             if len % 2 == 1 {
                 return acc;
             }
-            let pow = 10_u64.pow(len / 2);
+            let pow = powers_of_ten.get(len / 2).unwrap();
             if n / pow == n % pow {
                 return acc + n;
             }
@@ -42,10 +44,11 @@ fn main() {
             if n <= 10 {
                 return acc;
             }
-            let len = n.ilog10() + 1;
+            let len = (n.ilog10() + 1) as usize;
             match (1..=len / 2).rfind(|clen| {
-                let num = n % 10_u64.pow(*clen);
-                let res = (0..len / clen).fold(0, |acc, i| acc + num * 10_u64.pow(i * clen));
+                let num = n % powers_of_ten.get(*clen).unwrap();
+                let res = (0..len / clen)
+                    .fold(0, |acc, i| acc + num * powers_of_ten.get(i * clen).unwrap());
                 res == n
             }) {
                 Some(_) => acc + n,
