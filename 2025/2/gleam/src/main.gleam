@@ -29,20 +29,20 @@ pub fn main() {
       }
     })
 
-  // input
-  // |> list.fold(0, fn(acc, r) {
-  //   list.range(r.start, r.end)
-  //   |> list.fold(acc, fn(acc, i) {
-  //     let s = int.to_string(i)
-  //     let len = string.length(s)
-  //     case string.slice(s, 0, len / 2) |> string.repeat(2) == s {
-  //       True -> acc + i
-  //       False -> acc
-  //     }
-  //   })
-  // })
-  // |> int.to_string
-  // |> io.println
+  input
+  |> list.fold(0, fn(acc, r) {
+    list.range(r.start, r.end)
+    |> list.fold(acc, fn(acc, i) {
+      let s = int.to_string(i)
+      let len = string.length(s)
+      case string.slice(s, 0, len / 2) |> string.repeat(2) == s {
+        True -> acc + i
+        False -> acc
+      }
+    })
+  })
+  |> int.to_string
+  |> io.println
 
   input
   |> list.fold(0, fn(acc, r) {
