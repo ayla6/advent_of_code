@@ -48,20 +48,21 @@ pub fn main() {
   |> list.fold(0, fn(acc, r) {
     list.range(r.start, r.end)
     |> list.fold(acc, fn(acc, i) {
-      let s = int.to_string(i)
-      let len = string.length(s)
-      case len > 1 {
-        True ->
+      case i >= 10 {
+        True -> {
+          let s = int.to_string(i)
+          let len = string.length(s)
           list.range(len / 2, 1)
           |> list.fold_until(acc, fn(acc, cur_len) {
             let n =
               string.slice(s, 0, cur_len)
-              |> string.repeat(len / cur_len)
+              |> string.repeat(int.max(2, len / cur_len))
             case n == s {
               True -> list.Stop(acc + i)
               False -> list.Continue(acc)
             }
           })
+        }
         False -> acc
       }
     })
