@@ -9,9 +9,9 @@ fn main() {
         .trim()
         .split(",")
         .map(|v| {
-            let range: Vec<&str> = v.split("-").collect();
-            match range[..] {
-                [start, end] => Range {
+            let range = v.split_once("-");
+            match range {
+                Some((start, end)) => Range {
                     start: start.parse().expect("invalid number"),
                     end: end.parse().expect("invalid number"),
                 },
