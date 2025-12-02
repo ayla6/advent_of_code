@@ -21,7 +21,7 @@ fn main() {
 
     let powers_of_ten: Vec<u64> = (0..10).map(|i| 10_u64.pow(i)).collect();
 
-    let part_1 = &input.iter().fold(0_u64, |acc, v| {
+    let part_1 = input.iter().fold(0_u64, |acc, v| {
         (v.start..=v.end).fold(acc, |acc, n| {
             if n <= 10 {
                 return acc;
@@ -39,7 +39,7 @@ fn main() {
     });
     println!("{}", part_1);
 
-    let part_2 = &input.iter().fold(0_u64, |acc, v| {
+    let part_2 = input.iter().fold(0_u64, |acc, v| {
         (v.start..=v.end).fold(acc, |acc, n| {
             if n <= 10 {
                 return acc;
