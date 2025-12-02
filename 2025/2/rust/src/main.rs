@@ -62,6 +62,7 @@ fn main() {
     let part_2_invalid = part_2_invalid;
 
     let part_2 = input.iter().fold(0_u64, |acc, v| {
+        // the ideal one would be iterating through all the invalid ones but who cares i was too exposed to it to want to implement it myself
         (v.start..=v.end).fold(acc, |acc, num| {
             if num <= 10 {
                 return acc;
