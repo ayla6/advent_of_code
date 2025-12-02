@@ -61,17 +61,16 @@ fn main() {
     }
     let part_2_invalid = part_2_invalid;
 
-    let part_2 = input.iter().fold(0_u64, |acc, v| {
-        // the ideal one would be iterating through all the invalid ones but who cares i was too exposed to it to want to implement it myself
-        (v.start..=v.end).fold(acc, |acc, num| {
-            if num <= 10 {
-                return acc;
-            }
-            match part_2_invalid.get(&num) {
-                Some(_) => acc + num,
-                _ => acc,
-            }
-        })
+    let input_iter = input.iter();
+    let part_2 = part_2_invalid.iter().fold(0, |acc, number| {
+        if input_iter
+            .clone()
+            .any(|r| *number >= r.start && *number <= r.end)
+        {
+            acc + number
+        } else {
+            acc
+        }
     });
     println!("{}", part_2);
 }
