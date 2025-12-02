@@ -42,7 +42,7 @@ fn main() {
             State {
                 turn,
                 // if it is below zero before being moduloed and the original number itself wasn't zero it means that it did touch zero but the division thing wouldn't count it, so we give this extra support.
-                // of course, there is no need to deal with a negative to positive situation because the turn will never be negative!!!
+                // of course, there is no need to deal with a negative to positive situation because the acc.turn will never be negative!!!
                 zeroes: acc.zeroes + raw_zeroes + (acc.turn != 0 && raw_turn <= 0) as i32,
             }
         },
