@@ -12,8 +12,6 @@ type Range {
 pub fn main() {
   let assert Ok(input) = file.read(from: "../input.txt")
     as "Input file not found"
-  // let input =
-  //   "11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124"
   let input =
     input
     |> string.trim
@@ -48,7 +46,7 @@ pub fn main() {
   |> list.fold(0, fn(acc, r) {
     list.range(r.start, r.end)
     |> list.fold(acc, fn(acc, i) {
-      case i >= 10 {
+      case i > 10 {
         True -> {
           let s = int.to_string(i)
           let len = string.length(s)
