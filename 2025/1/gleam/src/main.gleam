@@ -6,7 +6,7 @@ import gleam/string
 import simplifile as file
 
 pub type RotationState {
-  RotationState(number: Int, zeroes: Int)
+  RotationState(turn: Int, zeroes: Int)
 }
 
 pub fn main() {
@@ -28,7 +28,7 @@ pub fn main() {
     input
     |> list.fold(RotationState(50, 0), fn(acc, v) {
       let new_number =
-        int.modulo(acc.number + v, 100)
+        int.modulo(acc.turn + v, 100)
         |> result.unwrap(0)
       RotationState(new_number, case new_number {
         0 -> acc.zeroes + 1
@@ -42,13 +42,13 @@ pub fn main() {
   let part2 =
     input
     |> list.fold(RotationState(50, 0), fn(acc, v) {
-      let raw_new_number = acc.number + v
+      let raw_new_number = acc.turn + v
       let raw_zeroes = int.absolute_value(raw_new_number / 100)
       let zeroes =
         acc.zeroes
-        + case acc.number != 0 && raw_new_number <= 0 {
+        + case acc.turn != 0 && raw_new_number <= 0 {
           // if it is below zero before being moduloed and the original number itself wasn't zero it means that it did touch zero but the division thing wouldn't count it, so we give this extra support.
-          // of course, there is no need to deal with a negative to positive situation because the acc number will never be negative!!!
+          // of course, there is no need to deal with a negative to positive situation because the turn will never be negative!!!
           True -> raw_zeroes + 1
           False -> raw_zeroes
         }
