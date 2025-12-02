@@ -23,7 +23,8 @@ pkgs.mkShellNoCC {
     clippy
     rustfmt
     rust-analyzer
-    gcc
+
+    clang
 
     hyperfine
     fish
