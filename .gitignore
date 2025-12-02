@@ -5,3 +5,5 @@ input.json
 input_example.txt
 _build
 target
+zig-out
+.zig-cache
