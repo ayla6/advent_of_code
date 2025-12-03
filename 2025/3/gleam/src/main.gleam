@@ -11,6 +11,7 @@ pub fn do(input, digits) {
   |> list.fold(0, fn(acc, bank) {
     let #(n, _) =
       // and here we're going and doing it the amount of times necessary. it's backwards for obvious reasons, we start from the end and this let's us not have like duplicated logic where we're doing digits - i constantly
+      // it needs to be digits - 1 to zero because otherwise it will cut too much when dropping stuff at list.reverse list.drop(i) list.reverse
       list.range(digits - 1, 0)
       // didn't want to create a type for it so yeah #(the digit we're at, the remaining part of the bank)
       |> list.fold(#(0, bank), fn(acc, i) {
@@ -36,6 +37,7 @@ pub fn do(input, digits) {
         // i wasn't using this number trick when i was doing it, i was literally just finding a power of 10 and multiplying it but like the power thing in gleam sucks it's like float only. i now learned this trick from *someone* and will be using it. don't know how i didn't figure out myself. oh wait i do it's because i'm stupid
         // but yeah it just multiplies the number by ten so like 4 becomes 40 and then we add our like 3 to it 43 and then 43 to 430 and the 5 you get the gist of it. again don't know how i didn't see it myself
         // and then we drop the parts of the list that can't be used for the subsequent numbers. like off by one evil thing in here to not include the number we just used too
+        // wky don't we add 1 to everything in the thing above? because that would be more math than just adding it only once here duh
         #(number * 10 + max, list.drop(bank, loc + 1))
       })
     // and then like every advent of code we add it to the acc
@@ -52,6 +54,7 @@ pub fn main() {
     |> string.split("\n")
     |> list.map(fn(bank) {
       // just get all the battery banks, separate them by character and turn each character in a member of a list
+      // and here we unwrap because only let's you do it with variables and that would be less clean here
       string.to_graphemes(bank)
       |> list.map(fn(s) { int.parse(s) |> result.unwrap(0) })
     })
