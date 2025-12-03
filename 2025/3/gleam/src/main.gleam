@@ -13,14 +13,11 @@ pub fn do(input, digits) {
       |> list.fold(#(0, bank), fn(acc, i) {
         let #(number, bank) = acc
 
-        let bank_find =
+        let max =
           bank
           |> list.reverse
           |> list.drop(i)
           |> list.reverse
-
-        let max =
-          bank_find
           |> list.max(int.compare)
           |> result.unwrap(
             bank |> list.reverse |> list.first |> result.unwrap(0),
