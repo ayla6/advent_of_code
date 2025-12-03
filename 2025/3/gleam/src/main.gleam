@@ -13,23 +13,16 @@ pub fn do(input, digits) {
       |> list.fold(#(0, bank), fn(acc, i) {
         let #(number, bank) = acc
 
-        let max =
+        let #(max, loc) =
           bank
           |> list.reverse
           |> list.drop(i)
           |> list.reverse
-          |> list.max(int.compare)
-          |> result.unwrap(
-            bank |> list.reverse |> list.first |> result.unwrap(0),
-          )
-
-        let max_loc =
-          bank
           |> list.index_map(fn(n, i) { #(n, i) })
-          |> list.key_find(max)
-          |> result.unwrap(0)
+          |> list.max(fn(a, b) { int.compare(a.0, b.0) })
+          |> result.unwrap(#(0, 0))
 
-        #(number * 10 + max, list.drop(bank, max_loc + 1))
+        #(number * 10 + max, list.drop(bank, loc + 1))
       })
     acc + n
   })
