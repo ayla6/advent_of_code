@@ -1,30 +1,33 @@
-use std::{iter::once, mem::swap};
+use std::mem::swap;
 
 fn generations(times: u32, mut world: Vec<u8>, size: usize, stuck: bool) -> Vec<u8> {
     #[inline]
-    fn get_at(world: &Vec<u8>, size: usize, x: usize, y: usize) -> u8 {
-        // benefits from the integer overflow to simplify code
-        if x >= size || y >= size {
-            return 0;
-        };
-        // this is in known bounds
-        unsafe { *world.get_unchecked(y * size + x) }
+    fn pos(x: usize, y: usize, size: usize) -> usize {
+        (1 + y) * (size + 2) + (1 + x)
     }
 
-    let mut new_world = vec![0_u8; size * size];
+    #[inline]
+    fn get_at(world: &Vec<u8>, size: usize, x: usize, y: usize) -> u8 {
+        // this is in known bounds
+        unsafe { *world.get_unchecked(pos(x, y, size)) }
+    }
+
     let sizem = size - 1;
+
+    let mut new_world = vec![0_u8; (size + 2).pow(2)];
+
     if stuck {
-        world[0] = 1;
-        world[sizem] = 1;
-        world[(size * size) - 1] = 1;
-        world[size * sizem] = 1;
+        world[pos(0, 0, size)] = 1;
+        world[pos(sizem, 0, size)] = 1;
+        world[pos(0, sizem, size)] = 1;
+        world[pos(sizem, sizem, size)] = 1;
     }
 
     for _ in 0..times {
-        for yo in 1..=size {
+        for yo in 0..size {
             let ym = yo - 1;
             let yp = yo + 1;
-            for xo in 1..=size {
+            for xo in 0..size {
                 let xm = xo - 1;
                 let xp = xo + 1;
 
@@ -37,7 +40,7 @@ fn generations(times: u32, mut world: Vec<u8>, size: usize, stuck: bool) -> Vec<
                     + get_at(&world, size, xm, yp)
                     + get_at(&world, size, xo, yp)
                     + get_at(&world, size, xp, yp);
-                new_world[yo * size + xo] = (neighbours == 3 || (neighbours == 2 && was)) as u8;
+                new_world[pos(xo, yo, size)] = (neighbours == 3 || (neighbours == 2 && was)) as u8;
             }
         }
 
@@ -45,10 +48,10 @@ fn generations(times: u32, mut world: Vec<u8>, size: usize, stuck: bool) -> Vec<
 
         // i hate the duplication here :(
         if stuck {
-            world[0] = 1;
-            world[sizem] = 1;
-            world[(size * size) - 1] = 1;
-            world[size * sizem] = 1;
+            world[pos(0, 0, size)] = 1;
+            world[pos(sizem, 0, size)] = 1;
+            world[pos(0, sizem, size)] = 1;
+            world[pos(sizem, sizem, size)] = 1;
         }
     }
     world
@@ -57,13 +60,15 @@ fn generations(times: u32, mut world: Vec<u8>, size: usize, stuck: bool) -> Vec<
 fn main() {
     let input = include_str!("../../input.txt").trim();
     let size = input.split_once("\n").expect("invalid input").0.len();
-    let input: Vec<u8> = once(".".repeat(size))
-        .chain(input.split("\n"))
-        .chain(".".repeat(size))
-        .map(|line| {
-            once(0)
-                .chain(line.chars().map(|v| (v == '#') as u8))
-                .chain(once(0))
+    // reads the input but adds a line of buffer on the sides
+    let buffer_line = ".".repeat(size);
+    let input: Vec<u8> = format!("{buffer_line}\n{input}\n{buffer_line}")
+        .split("\n")
+        .map(|line| -> Vec<u8> {
+            format!(".{}.", line)
+                .chars()
+                .map(|v| (v == '#') as u8)
+                .collect()
         })
         .flatten()
         .collect();
