@@ -1,21 +1,33 @@
-fn solve(input: &Vec<Vec<u32>>, digits: usize) {
-    input.iter().fold(0, |acc, bank| {
-        let n = (0..digits).fold((0, bank), |(number, bank), i| {
-            let max = bank[0..bank.len() - i]
-                .iter()
-                .max()
-                .unwrap_or(bank.last().unwrap());
+// fun fact for this version, my biggest bug was integer overflow when i was using u32 because im not accustumed to this shit
 
-            return (number * 10 + max, bank[0..bank.len() - max_loc - 1]);
+fn solve(input: &Vec<Vec<u64>>, digits: usize) -> u64 {
+    input.iter().fold(0, |acc, bank| {
+        let bank_len = bank.len();
+        let (n, _) = (0..digits).rfold((0, 0), |(number, bank_index), i| {
+            let (loc, max) = bank[bank_index..bank_len - i].iter().enumerate().fold(
+                (0_usize, &0_u64),
+                |(maxi, max), (i, n)| {
+                    if n > max { (i, n) } else { (maxi, max) }
+                },
+            );
+
+            ((number * 10) + max, bank_index + loc + 1)
         });
         acc + n
     })
 }
 
 fn main() {
-    let input: Vec<Vec<u32>> = include_str!("../../input.txt")
+    let input: Vec<Vec<u64>> = include_str!("../../input.txt")
         .trim()
         .split("\n")
-        .map(|bank| bank.chars().map(|s| s.to_digit(10).unwrap()).collect())
+        .map(|bank| {
+            bank.chars()
+                .map(|s| s.to_digit(10).unwrap() as u64)
+                .collect()
+        })
         .collect();
+
+    println!("Part 1: {}", solve(&input, 2));
+    println!("Part 1: {}", solve(&input, 12));
 }
