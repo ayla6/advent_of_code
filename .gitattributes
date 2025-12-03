@@ -1,2 +1,4 @@
-template/** -lingust-detectable
+template/** -linguist-detectable
 build.zig -linguist-detectable
+template/** linguist-vendored
+build.zig linguist-vendored
