@@ -1,4 +1,3 @@
-import gleam/float
 import gleam/int
 import gleam/io
 import gleam/list
@@ -10,13 +9,14 @@ pub fn do(input, digits) {
   input
   |> list.fold(0, fn(acc, bank) {
     let #(n, _) =
-      list.range(digits, 1)
+      list.range(digits - 1, 0)
       |> list.fold(#(0, bank), fn(acc, i) {
         let #(number, bank) = acc
+
         let bank_find =
           bank
           |> list.reverse
-          |> list.drop(i - 1)
+          |> list.drop(i)
           |> list.reverse
 
         let max =
@@ -30,14 +30,7 @@ pub fn do(input, digits) {
           |> list.key_find(max)
           |> result.unwrap(0)
 
-        #(
-          number
-            + max
-            * float.round(
-            int.power(10, int.to_float(i - 1)) |> result.unwrap(0.0),
-          ),
-          list.drop(bank, max_loc + 1),
-        )
+        #(number * 10 + max, list.drop(bank, max_loc + 1))
       })
     acc + n
   })
