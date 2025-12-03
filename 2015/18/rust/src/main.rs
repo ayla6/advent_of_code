@@ -1,22 +1,19 @@
 use std::mem::swap;
 
 #[inline]
-fn get_at(world: &Vec<bool>, size: usize, x: isize, y: isize) -> u8 {
-    let isize = size as isize;
-    if x == isize || x == -1 || y == isize || y == -1 {
+fn get_at(world: &Vec<bool>, size: usize, x: usize, y: usize) -> u8 {
+    // benefits from the integer overflow to simplify code
+    if x >= size || y >= size {
         return 0;
     };
-    let (x, y) = (x as usize, y as usize);
-    if *world.get(y * size + x).expect("invalid position") {
-        1
-    } else {
-        0
-    }
+    // this is in known bounds
+    unsafe { *world.get_unchecked(y * size + x) as u8 }
 }
 
 #[inline]
 fn get_at_bool(world: &Vec<bool>, size: usize, x: usize, y: usize) -> bool {
-    *world.get(y * size + x).expect("invalid position")
+    // this is in known bounds
+    unsafe { *world.get_unchecked(y * size + x) }
 }
 
 fn generations(times: u32, mut world: Vec<bool>, size: usize, stuck: bool) -> Vec<bool> {
@@ -30,16 +27,14 @@ fn generations(times: u32, mut world: Vec<bool>, size: usize, stuck: bool) -> Ve
     }
 
     for _ in 0..times {
-        for y in 0..size {
-            for x in 0..size {
-                let xo = x as isize;
-                let yo = y as isize;
-                let xm = xo - 1;
-                let ym = yo - 1;
+        for yo in 0..size {
+            let ym = yo.wrapping_sub(1);
+            let yp = yo + 1;
+            for xo in 0..size {
+                let xm = xo.wrapping_sub(1);
                 let xp = xo + 1;
-                let yp = yo + 1;
 
-                let was = get_at_bool(&world, size, x, y);
+                let was = get_at_bool(&world, size, xo, yo);
                 let neighbours = get_at(&world, size, xm, ym)
                     + get_at(&world, size, xo, ym)
                     + get_at(&world, size, xp, ym)
@@ -48,7 +43,7 @@ fn generations(times: u32, mut world: Vec<bool>, size: usize, stuck: bool) -> Ve
                     + get_at(&world, size, xm, yp)
                     + get_at(&world, size, xo, yp)
                     + get_at(&world, size, xp, yp);
-                new_world[y * size + x] = neighbours == 3 || (neighbours == 2 && was);
+                new_world[yo * size + xo] = neighbours == 3 || (neighbours == 2 && was);
             }
         }
 
