@@ -3,6 +3,7 @@ use std::mem::swap;
 fn generations(times: u32, mut world: Vec<u8>, size: usize, stuck: bool) -> Vec<u8> {
     #[inline]
     fn pos(x: usize, y: usize, size: usize) -> usize {
+        // this shit is unreadable man
         (1 + y) * (size + 2) + (1 + x)
     }
 
@@ -60,7 +61,7 @@ fn generations(times: u32, mut world: Vec<u8>, size: usize, stuck: bool) -> Vec<
 fn main() {
     let input = include_str!("../../input.txt").trim();
     let size = input.split_once("\n").expect("invalid input").0.len();
-    // reads the input but adds a line of buffer on the sides
+    // reads the input but adds a line of buffer on the sides. unreadable
     let buffer_line = ".".repeat(size);
     let input: Vec<u8> = format!("{buffer_line}\n{input}\n{buffer_line}")
         .split("\n")
