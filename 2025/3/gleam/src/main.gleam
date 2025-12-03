@@ -29,6 +29,7 @@ pub fn do(input, digits) {
           |> list.index_map(fn(n, i) { #(n, i) })
           |> list.key_find(max)
           |> result.unwrap(0)
+
         #(
           number
             + max
