@@ -29,5 +29,5 @@ fn main() {
         .collect();
 
     println!("Part 1: {}", solve(&input, 2));
-    println!("Part 1: {}", solve(&input, 12));
+    println!("Part 2: {}", solve(&input, 12));
 }
