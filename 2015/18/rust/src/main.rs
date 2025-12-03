@@ -1,17 +1,13 @@
 use std::mem::swap;
 
 #[inline]
-fn get_at(world: &Vec<Vec<bool>>, size: usize, x: isize, y: isize) -> u8 {
+fn get_at(world: &Vec<bool>, size: usize, x: isize, y: isize) -> u8 {
     let isize = size as isize;
     if x == isize || x == -1 || y == isize || y == -1 {
         return 0;
     };
-    if *world
-        .get(y as usize)
-        .expect("invalid position")
-        .get(x as usize)
-        .expect("invalid position")
-    {
+    let (x, y) = (x as usize, y as usize);
+    if *world.get(y * size + x).expect("invalid position") {
         1
     } else {
         0
@@ -19,22 +15,18 @@ fn get_at(world: &Vec<Vec<bool>>, size: usize, x: isize, y: isize) -> u8 {
 }
 
 #[inline]
-fn get_at_bool(world: &Vec<Vec<bool>>, x: usize, y: usize) -> bool {
-    *world
-        .get(y)
-        .expect("invalid position")
-        .get(x)
-        .expect("invalid position")
+fn get_at_bool(world: &Vec<bool>, size: usize, x: usize, y: usize) -> bool {
+    *world.get(y * size + x).expect("invalid position")
 }
 
-fn generations(times: u32, mut world: Vec<Vec<bool>>, size: usize, stuck: bool) -> Vec<Vec<bool>> {
-    let mut new_world = vec![vec![false; size]; size];
+fn generations(times: u32, mut world: Vec<bool>, size: usize, stuck: bool) -> Vec<bool> {
+    let mut new_world = vec![false; size * size];
+    let sizem = size - 1;
     if stuck {
-        let sizem = size - 1;
-        world[0][0] = true;
-        world[0][sizem] = true;
-        world[sizem][0] = true;
-        world[sizem][sizem] = true;
+        world[0] = true;
+        world[sizem] = true;
+        world[(size * size) - 1] = true;
+        world[size * sizem] = true;
     }
 
     for _ in 0..times {
@@ -47,7 +39,7 @@ fn generations(times: u32, mut world: Vec<Vec<bool>>, size: usize, stuck: bool) 
                 let xp = xo + 1;
                 let yp = yo + 1;
 
-                let was = get_at_bool(&world, x, y);
+                let was = get_at_bool(&world, size, x, y);
                 let neighbours = get_at(&world, size, xm, ym)
                     + get_at(&world, size, xo, ym)
                     + get_at(&world, size, xp, ym)
@@ -56,7 +48,7 @@ fn generations(times: u32, mut world: Vec<Vec<bool>>, size: usize, stuck: bool) 
                     + get_at(&world, size, xm, yp)
                     + get_at(&world, size, xo, yp)
                     + get_at(&world, size, xp, yp);
-                new_world[y][x] = neighbours == 3 || (neighbours == 2 && was);
+                new_world[y * size + x] = neighbours == 3 || (neighbours == 2 && was);
             }
         }
 
@@ -64,11 +56,10 @@ fn generations(times: u32, mut world: Vec<Vec<bool>>, size: usize, stuck: bool) 
 
         // i hate the duplication here :(
         if stuck {
-            let sizem = size - 1;
-            world[0][0] = true;
-            world[0][sizem] = true;
-            world[sizem][0] = true;
-            world[sizem][sizem] = true;
+            world[0] = true;
+            world[sizem] = true;
+            world[(size * size) - 1] = true;
+            world[size * sizem] = true;
         }
     }
     world
@@ -77,21 +68,16 @@ fn generations(times: u32, mut world: Vec<Vec<bool>>, size: usize, stuck: bool) 
 fn main() {
     let input = include_str!("../../input.txt").trim();
     let size = input.split_once("\n").expect("invalid input").0.len();
-    let input: Vec<Vec<bool>> = input
-        .split("\n")
-        .map(|line| line.chars().map(|v| v == '#').collect())
-        .collect();
+    let input: Vec<bool> = input.replace("\n", "").chars().map(|v| v == '#').collect();
 
     let part_1 = generations(100, input.clone(), size, false)
         .iter()
-        .flatten()
         .filter(|v| **v)
         .count();
     println!("Part 1: {}", part_1);
 
     let part_2 = generations(100, input.clone(), size, true)
         .iter()
-        .flatten()
         .filter(|v| **v)
         .count();
     println!("Part 2: {}", part_2);
