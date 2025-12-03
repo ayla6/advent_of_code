@@ -1,16 +1,16 @@
-use std::mem::swap;
-
-#[inline]
-fn get_at(world: &Vec<u8>, size: usize, x: usize, y: usize) -> u8 {
-    // benefits from the integer overflow to simplify code
-    if x >= size || y >= size {
-        return 0;
-    };
-    // this is in known bounds
-    unsafe { *world.get_unchecked(y * size + x) }
-}
+use std::{iter::once, mem::swap};
 
 fn generations(times: u32, mut world: Vec<u8>, size: usize, stuck: bool) -> Vec<u8> {
+    #[inline]
+    fn get_at(world: &Vec<u8>, size: usize, x: usize, y: usize) -> u8 {
+        // benefits from the integer overflow to simplify code
+        if x >= size || y >= size {
+            return 0;
+        };
+        // this is in known bounds
+        unsafe { *world.get_unchecked(y * size + x) }
+    }
+
     let mut new_world = vec![0_u8; size * size];
     let sizem = size - 1;
     if stuck {
@@ -21,11 +21,11 @@ fn generations(times: u32, mut world: Vec<u8>, size: usize, stuck: bool) -> Vec<
     }
 
     for _ in 0..times {
-        for yo in 0..size {
-            let ym = yo.wrapping_sub(1);
+        for yo in 1..=size {
+            let ym = yo - 1;
             let yp = yo + 1;
-            for xo in 0..size {
-                let xm = xo.wrapping_sub(1);
+            for xo in 1..=size {
+                let xm = xo - 1;
                 let xp = xo + 1;
 
                 let was = get_at(&world, size, xo, yo) == 1;
@@ -57,10 +57,15 @@ fn generations(times: u32, mut world: Vec<u8>, size: usize, stuck: bool) -> Vec<
 fn main() {
     let input = include_str!("../../input.txt").trim();
     let size = input.split_once("\n").expect("invalid input").0.len();
-    let input: Vec<u8> = input
-        .replace("\n", "")
-        .chars()
-        .map(|v| (v == '#') as u8)
+    let input: Vec<u8> = once(".".repeat(size))
+        .chain(input.split("\n"))
+        .chain(".".repeat(size))
+        .map(|line| {
+            once(0)
+                .chain(line.chars().map(|v| (v == '#') as u8))
+                .chain(once(0))
+        })
+        .flatten()
         .collect();
 
     let part_1 = generations(100, input.clone(), size, false)
