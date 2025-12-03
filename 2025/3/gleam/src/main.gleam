@@ -22,7 +22,9 @@ pub fn do(input, digits) {
         let max =
           bank_find
           |> list.max(int.compare)
-          |> result.unwrap(list.last(bank) |> result.unwrap(0))
+          |> result.unwrap(
+            bank |> list.reverse |> list.first |> result.unwrap(0),
+          )
 
         let max_loc =
           bank
