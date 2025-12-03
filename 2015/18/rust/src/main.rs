@@ -3,8 +3,7 @@ use std::mem::swap;
 fn generations(times: u32, mut world: Vec<u8>, size: usize, stuck: bool) -> Vec<u8> {
     #[inline]
     fn pos(x: usize, y: usize, size: usize) -> usize {
-        // this shit is unreadable man
-        (1 + y) * (size + 2) + (1 + x)
+        y * (size + 2) + x
     }
 
     #[inline]
@@ -13,22 +12,22 @@ fn generations(times: u32, mut world: Vec<u8>, size: usize, stuck: bool) -> Vec<
         unsafe { *world.get_unchecked(pos(x, y, size)) }
     }
 
-    let sizem = size - 1;
+    let sizep = size + 1;
 
     let mut new_world = vec![0_u8; (size + 2).pow(2)];
 
     if stuck {
-        world[pos(0, 0, size)] = 1;
-        world[pos(sizem, 0, size)] = 1;
-        world[pos(0, sizem, size)] = 1;
-        world[pos(sizem, sizem, size)] = 1;
+        world[pos(1, 1, size)] = 1;
+        world[pos(size, 1, size)] = 1;
+        world[pos(1, size, size)] = 1;
+        world[pos(size, size, size)] = 1;
     }
 
     for _ in 0..times {
-        for yo in 0..size {
+        for yo in 1..sizep {
             let ym = yo - 1;
             let yp = yo + 1;
-            for xo in 0..size {
+            for xo in 1..sizep {
                 let xm = xo - 1;
                 let xp = xo + 1;
 
@@ -49,10 +48,10 @@ fn generations(times: u32, mut world: Vec<u8>, size: usize, stuck: bool) -> Vec<
 
         // i hate the duplication here :(
         if stuck {
-            world[pos(0, 0, size)] = 1;
-            world[pos(sizem, 0, size)] = 1;
-            world[pos(0, sizem, size)] = 1;
-            world[pos(sizem, sizem, size)] = 1;
+            world[pos(1, 1, size)] = 1;
+            world[pos(size, 1, size)] = 1;
+            world[pos(1, size, size)] = 1;
+            world[pos(size, size, size)] = 1;
         }
     }
     world
@@ -61,7 +60,7 @@ fn generations(times: u32, mut world: Vec<u8>, size: usize, stuck: bool) -> Vec<
 fn main() {
     let input = include_str!("../../input.txt").trim();
     let size = input.split_once("\n").expect("invalid input").0.len();
-    // reads the input but adds a line of buffer on the sides. unreadable
+    // reads the input but adds a line of buffer on the sides
     let buffer_line = ".".repeat(size);
     let input: Vec<u8> = format!("{buffer_line}\n{input}\n{buffer_line}")
         .split("\n")
