@@ -24,14 +24,12 @@ pub fn main() {
       list.range(2, 1)
       |> list.fold(#(0, bank), fn(acc, i) {
         let #(number, bank) = acc
-        let bank_find = case i {
-          2 ->
-            bank
-            |> list.reverse
-            |> list.drop(1)
-            |> list.reverse
-          _ -> bank
-        }
+        let bank_find =
+          bank
+          |> list.reverse
+          |> list.drop(i - 1)
+          |> list.reverse
+
         let max =
           bank_find
           |> list.max(int.compare)
@@ -45,10 +43,45 @@ pub fn main() {
         #(
           number
             + max
-            * case i {
-            2 -> 10
-            _ -> 1
-          },
+            * float.round(
+            int.power(10, int.to_float(i - 1)) |> result.unwrap(0.0),
+          ),
+          list.drop(bank, max_loc + 1),
+        )
+      })
+    acc + n
+  })
+  |> int.to_string
+  |> io.println
+
+  input
+  |> list.fold(0, fn(acc, bank) {
+    let #(n, _) =
+      list.range(12, 1)
+      |> list.fold(#(0, bank), fn(acc, i) {
+        let #(number, bank) = acc
+        let bank_find =
+          bank
+          |> list.reverse
+          |> list.drop(i - 1)
+          |> list.reverse
+
+        let max =
+          bank_find
+          |> list.max(int.compare)
+          |> result.unwrap(list.last(bank) |> result.unwrap(0))
+
+        let max_loc =
+          bank
+          |> list.index_map(fn(n, i) { #(n, i) })
+          |> list.key_find(max)
+          |> result.unwrap(0)
+        #(
+          number
+            + max
+            * float.round(
+            int.power(10, int.to_float(i - 1)) |> result.unwrap(0.0),
+          ),
           list.drop(bank, max_loc + 1),
         )
       })
