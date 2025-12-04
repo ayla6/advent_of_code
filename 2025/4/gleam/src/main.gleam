@@ -67,8 +67,8 @@ fn part_2(map, size, rolls) {
 
       case roll, neighbours < 4 {
         1, True -> #(total + 1, bit_array.append(new_map, <<".">>))
-        0, _ -> #(total, bit_array.append(new_map, <<".">>))
-        1, _ | _, _ -> #(total, bit_array.append(new_map, <<"@">>))
+        1, _ -> #(total, bit_array.append(new_map, <<"@">>))
+        _, _ -> #(total, bit_array.append(new_map, <<".">>))
       }
     })
 
