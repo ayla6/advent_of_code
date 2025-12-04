@@ -21,7 +21,8 @@ fn find(input: &str, requires: usize) -> u32 {
 }
 
 fn main() {
-    let input = std::fs::read_to_string("../input.txt").expect("invalid input!!");
+    let input =
+        std::fs::read_to_string("../input.txt").expect("invalid input!!");
     let input = input.trim();
 
     let res = find(input, 5);

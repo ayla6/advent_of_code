@@ -1,7 +1,8 @@
 use itertools::Itertools;
 
 fn main() {
-    let input = std::fs::read_to_string("../input.txt").expect("invalid input!!");
+    let input =
+        std::fs::read_to_string("../input.txt").expect("invalid input!!");
     let input = input
         .trim()
         .split("\n")

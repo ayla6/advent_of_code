@@ -4,12 +4,12 @@ fn solve(input: &Vec<Vec<u64>>, digits: usize) -> u64 {
     input.iter().fold(0, |acc, bank| {
         let bank_len = bank.len();
         let (n, _) = (0..digits).rfold((0, 0), |(number, bank_index), i| {
-            let (loc, max) = bank[bank_index..bank_len - i].iter().enumerate().fold(
-                (0_usize, &0_u64),
-                |(maxi, max), (i, n)| {
+            let (loc, max) = bank[bank_index..bank_len - i]
+                .iter()
+                .enumerate()
+                .fold((0_usize, &0_u64), |(maxi, max), (i, n)| {
                     if n > max { (i, n) } else { (maxi, max) }
-                },
-            );
+                });
 
             ((number * 10) + max, bank_index + loc + 1)
         });

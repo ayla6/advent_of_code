@@ -1,6 +1,11 @@
 use std::mem::swap;
 
-fn generations(times: u32, mut world: Vec<u8>, size: usize, stuck: bool) -> Vec<u8> {
+fn generations(
+    times: u32,
+    mut world: Vec<u8>,
+    size: usize,
+    stuck: bool,
+) -> Vec<u8> {
     let pos = |x, y| y * (size + 2) + x;
 
     let sizep = size + 1;

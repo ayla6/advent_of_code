@@ -23,7 +23,8 @@ fn main() {
         })
         .collect();
 
-    let powers_of_ten: Vec<u64> = (0..=MAX_LENGTH as u32).map(|i| 10_u64.pow(i)).collect();
+    let powers_of_ten: Vec<u64> =
+        (0..=MAX_LENGTH as u32).map(|i| 10_u64.pow(i)).collect();
 
     let [invalid_part_1, invalid_part_2] = {
         let mut part_1: HashSet<u64> = HashSet::new();
@@ -31,13 +32,14 @@ fn main() {
 
         for len in 1..=MAX_LENGTH / 2 {
             // 1-9, 10-99, 100-999, 100000-999999
-            for combination in
-                *powers_of_ten.get(len - 1).unwrap_or(&1)..*powers_of_ten.get(len).unwrap()
+            for combination in *powers_of_ten.get(len - 1).unwrap_or(&1)
+                ..*powers_of_ten.get(len).unwrap()
             {
                 let mut number = 0;
                 // 0 is just the number (9), 1 is one repetition (99)
                 for repeat in 0..MAX_LENGTH / len {
-                    number += combination * powers_of_ten.get((len * repeat) as usize).unwrap();
+                    number += combination
+                        * powers_of_ten.get((len * repeat) as usize).unwrap();
                     if repeat > 0 {
                         part_2.insert(number);
                     }
