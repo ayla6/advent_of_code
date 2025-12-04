@@ -7,3 +7,11 @@ _build
 target
 zig-out
 .zig-cache
+out
+*.ppm
+*.pgm
+*.pbm
+*.bmp
+*.png
+*.gif
+*.qoi
