@@ -7,6 +7,7 @@ fn solve(input: &Vec<Vec<u64>>, digits: usize) -> u64 {
             let (loc, max) = bank[bank_index..bank_len - i]
                 .iter()
                 .enumerate()
+                // apparently the compiler is fine with reversing this and then using the standard max_by but im not. and it seems to have the same speed results. im not gonna be using tricks here ok im nice
                 .reduce(
                     |(maxi, max), (i, n)| {
                         if n > max { (i, n) } else { (maxi, max) }
