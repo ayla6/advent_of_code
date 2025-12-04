@@ -10,11 +10,7 @@ fn to_img(warehouse: &Vec<u8>, size: usize, name: usize) {
     let mut i = size + 3;
     for _ in 0..size {
         for _ in 0..size {
-            bytes.extend(if warehouse.get(i).unwrap() == &1_u8 {
-                [1]
-            } else {
-                [0]
-            });
+            bytes.push(*warehouse.get(i).unwrap());
             i += 1;
         }
         i += 2;
