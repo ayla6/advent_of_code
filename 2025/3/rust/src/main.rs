@@ -7,9 +7,13 @@ fn solve(input: &Vec<Vec<u64>>, digits: usize) -> u64 {
             let (loc, max) = bank[bank_index..bank_len - i]
                 .iter()
                 .enumerate()
-                .fold((0_usize, &0_u64), |(maxi, max), (i, n)| {
-                    if n > max { (i, n) } else { (maxi, max) }
-                });
+                .reduce(
+                    |(maxi, max), (i, n)| {
+                        if n > max { (i, n) } else { (maxi, max) }
+                    },
+                )
+                // #yup #i'm unwrapping #idontwannausefold
+                .unwrap();
 
             ((number * 10) + max, bank_index + loc + 1)
         });
