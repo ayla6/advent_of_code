@@ -15,16 +15,16 @@ pub fn main() {
     fresh_ranges
     |> string.trim
     |> string.split("\n")
-    |> list.reverse
-    |> list.drop(5)
-    |> list.take(12)
-    |> list.reverse
+    // |> list.reverse
+    // |> list.drop(5)
+    // |> list.take(12)
+    // |> list.reverse
     |> list.map(fn(i) {
       let assert [from, to] = i |> string.trim |> string.split("-")
       let assert Ok(from) = int.parse(from)
       let assert Ok(to) = int.parse(to)
-      #(from / 100_000_000, to / 100_000_000)
-      // #(from, to)
+      // #(from / 100_000_000, to / 100_000_000)
+      #(from, to)
     })
   let available =
     available
@@ -60,14 +60,14 @@ pub fn main() {
         prev_seen_ranges
         |> set.fold(#(range, prev_seen_ranges), fn(acc, seen_range) {
           let #(range, seen_ranges) = acc
-          echo #(
-            range,
-            seen_range,
-            int.compare(range.0, seen_range.0),
-            int.compare(range.1, seen_range.1),
-            int.compare(range.0, seen_range.1),
-            int.compare(range.1, seen_range.0),
-          )
+          // echo #(
+          //   range,
+          //   seen_range,
+          //   int.compare(range.0, seen_range.0),
+          //   int.compare(range.1, seen_range.1),
+          //   int.compare(range.0, seen_range.1),
+          //   int.compare(range.1, seen_range.0),
+          // )
           case
             int.compare(range.0, seen_range.0),
             int.compare(range.1, seen_range.1),
@@ -92,12 +92,8 @@ pub fn main() {
               #(range.0, seen_range.1),
               set.delete(seen_ranges, seen_range),
             )
-            Gt, Gt, Lt, Gt -> #(
+            Gt, Gt, Lt, Gt | Gt, Gt, Eq, Gt -> #(
               #(seen_range.0, range.1),
-              set.delete(seen_ranges, seen_range),
-            )
-            Gt, Gt, Eq, Gt -> #(
-              #(seen_range.0, range.0),
               set.delete(seen_ranges, seen_range),
             )
             _, _, _, _ -> #(range, seen_ranges)
@@ -109,7 +105,7 @@ pub fn main() {
         True -> seen_ranges
       }
     })
-  echo ranges
+  // echo ranges
   ranges
   |> set.fold(0, fn(acc, range) { acc + range.1 - range.0 + 1 })
   |> int.to_string
