@@ -75,28 +75,23 @@ pub fn main() {
             int.compare(range.1, seen_range.0)
           {
             Gt, Gt, Gt, Gt | Lt, Lt, Lt, Lt -> #(range, seen_ranges)
-            Eq, Eq, Eq, Eq
-            | Gt, Lt, Lt, Gt
-            | Eq, Lt, Lt, Gt
-            | Eq, Lt, Lt, Eq
-            | Gt, Eq, Lt, Gt
-            | Gt, Eq, Eq, Gt
-            | Eq, Eq, Lt, Gt
-            -> #(#(0, 0), seen_ranges)
-            Eq, Gt, Eq, Gt | Lt, Eq, Lt, Gt | Lt, Gt, Lt, Gt | Lt, Eq, Lt, Eq -> #(
+            Eq, Eq, _, _ | Gt, Lt, _, _ | Eq, Lt, _, _ | Gt, Eq, _, _ -> #(
+              #(0, 0),
+              seen_ranges,
+            )
+            Eq, Gt, Eq, Gt | Lt, Eq, _, _ | Lt, Gt, _, _ -> #(
               range,
               set.delete(seen_ranges, seen_range),
             )
-            Eq, Gt, Lt, Gt -> #(range, set.delete(seen_ranges, seen_range))
-            Lt, Lt, Lt, Gt | Lt, Lt, Lt, Eq -> #(
+            Eq, Gt, _, _ -> #(range, set.delete(seen_ranges, seen_range))
+            Lt, Lt, _, _ -> #(
               #(range.0, seen_range.1),
               set.delete(seen_ranges, seen_range),
             )
-            Gt, Gt, Lt, Gt | Gt, Gt, Eq, Gt -> #(
+            Gt, Gt, _, _ -> #(
               #(seen_range.0, range.1),
               set.delete(seen_ranges, seen_range),
             )
-            _, _, _, _ -> #(range, seen_ranges)
           }
         })
 
