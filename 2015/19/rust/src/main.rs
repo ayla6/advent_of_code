@@ -21,38 +21,24 @@ fn main() {
         combinations
     };
 
-    let medicine_mol: Vec<String> = {
-        let mut mol = Vec::new();
-        input.last().unwrap().chars().for_each(|letter| {
-            if letter.is_lowercase() {
-                mol.push(format!("{}{}", mol.last().unwrap(), letter));
-            } else {
-                mol.push(format!("{}", letter))
-            }
-        });
-        mol
-    };
-    println!("{:?}", medicine_mol);
+    let medicine_mol = input.last().unwrap();
 
     // part 1
     {
         let mol_len = medicine_mol.len();
         let mut possibilities: HashSet<String> = HashSet::new();
-        for (k, element) in medicine_mol.iter().enumerate() {
-            let of_element = combinations.get(element);
-
-            match of_element {
-                Some(of_element) => of_element.iter().for_each(|new_element| {
+        for i in 0..mol_len {
+            let (a, b) = medicine_mol.split_at(i);
+            combinations.iter().for_each(|(from, to)| {
+                to.iter().for_each(|to| {
                     possibilities.insert(format!(
-                        "{}{}{}",
-                        medicine_mol[0..k].join(""),
-                        new_element,
-                        medicine_mol[k + 1..mol_len].join("")
+                        "{}{}",
+                        a,
+                        b.replacen(from, to, 1)
                     ));
-                }),
-                _ => {}
-            }
+                })
+            });
         }
-        println!("Part 1: {}", possibilities.len())
+        println!("Part 1: {}", possibilities.len() - 1)
     }
 }
