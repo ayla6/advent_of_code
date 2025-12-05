@@ -79,11 +79,10 @@ pub fn main() {
               #(0, 0),
               seen_ranges,
             )
-            Eq, Gt, Eq, Gt | Lt, Eq, _, _ | Lt, Gt, _, _ -> #(
+            Eq, Gt, _, _ | Lt, Eq, _, _ | Lt, Gt, _, _ -> #(
               range,
               set.delete(seen_ranges, seen_range),
             )
-            Eq, Gt, _, _ -> #(range, set.delete(seen_ranges, seen_range))
             Lt, Lt, _, _ -> #(
               #(range.0, seen_range.1),
               set.delete(seen_ranges, seen_range),
