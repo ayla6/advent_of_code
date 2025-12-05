@@ -68,25 +68,31 @@ pub fn main() {
           //   int.compare(range.0, seen_range.1),
           //   int.compare(range.1, seen_range.0),
           // )
+          // btw im refusing to ever do something better than this idc about your sorting and whatever this is the way shut the fuck up i spent three hours on this i will be using it
           case
             int.compare(range.0, seen_range.0),
             int.compare(range.1, seen_range.1),
             int.compare(range.0, seen_range.1),
             int.compare(range.1, seen_range.0)
           {
+            // if there's no touching
             Gt, Gt, Gt, Gt | Lt, Lt, Lt, Lt -> #(range, seen_ranges)
-            Eq, Eq, _, _ | Gt, Lt, _, _ | Eq, Lt, _, _ | Gt, Eq, _, _ -> #(
+            // if it's inside of the other one
+            Gt, Lt, _, _ | Eq, Lt, _, _ | Gt, Eq, _, _ | Eq, Eq, _, _ -> #(
               #(0, 0),
               seen_ranges,
             )
-            Eq, Gt, _, _ | Lt, Eq, _, _ | Lt, Gt, _, _ -> #(
+            // if the other one is inside it
+            Lt, Gt, _, _ | Eq, Gt, _, _ | Lt, Eq, _, _ -> #(
               range,
               set.delete(seen_ranges, seen_range),
             )
+            // if it's touching on the left side make them touch
             Lt, Lt, _, _ -> #(
               #(range.0, seen_range.1),
               set.delete(seen_ranges, seen_range),
             )
+            // if it's touching on the right size make them touch
             Gt, Gt, _, _ -> #(
               #(seen_range.0, range.1),
               set.delete(seen_ranges, seen_range),
