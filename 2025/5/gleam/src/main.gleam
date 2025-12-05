@@ -85,7 +85,7 @@ pub fn main() {
           Gt, Gt, Gt, Gt | Lt, Lt, Lt, Lt -> #(range, seen_ranges)
           // if it's inside of the other one
           Gt, Lt, _, _ | Eq, Lt, _, _ | Gt, Eq, _, _ | Eq, Eq, _, _ -> #(
-            #(0, 0),
+            #(-1, -1),
             seen_ranges,
           )
           // if the other one is inside it
@@ -106,7 +106,7 @@ pub fn main() {
         }
       })
 
-    case range == #(0, 0) {
+    case range == #(-1, -1) {
       False -> seen_ranges |> set.insert(range)
       True -> seen_ranges
     }
