@@ -2,7 +2,6 @@ import gleam/dict
 import gleam/int
 import gleam/io
 import gleam/list
-import gleam/regexp
 import gleam/result
 import gleam/string
 import simplifile as file
@@ -33,25 +32,25 @@ pub fn main() {
       acc |> string.replace("  ", " ")
     })
 
-  let part_1 =
-    input_pt_1
-    |> string.split("\n")
-    |> list.map(fn(i) { string.trim(i) |> string.split(" ") })
-    |> list.transpose
-    |> list.map(fn(i) {
-      let i = list.reverse(i)
-      let assert Ok(s) = list.first(i)
-      let i =
-        list.drop(i, 1) |> list.map(fn(i) { int.parse(i) |> result.unwrap(0) })
-      let r = case s {
-        "+" -> int.sum(i)
-        "*" -> list.reduce(i, int.multiply) |> result.unwrap(0)
-        _ -> panic as "invalid"
-      }
-      r
-    })
-    |> int.sum
-  echo part_1
+  input_pt_1
+  |> string.split("\n")
+  |> list.map(fn(i) { string.trim(i) |> string.split(" ") })
+  |> list.transpose
+  |> list.map(fn(i) {
+    let i = list.reverse(i)
+    let assert Ok(s) = list.first(i)
+    let i =
+      list.drop(i, 1) |> list.map(fn(i) { int.parse(i) |> result.unwrap(0) })
+    let r = case s {
+      "+" -> int.sum(i)
+      "*" -> list.reduce(i, int.multiply) |> result.unwrap(0)
+      _ -> panic as "invalid"
+    }
+    r
+  })
+  |> int.sum
+  |> int.to_string
+  |> io.println
 
   let lines =
     input
@@ -68,77 +67,74 @@ pub fn main() {
         _ -> acc
       }
     })
-  let input_pt_2 =
-    bounds
-    |> list.index_fold(dict.new(), fn(d, bound, i) {
-      let numbers =
-        list.map(lines, fn(line) {
-          string.slice(line, bound.0, bound.1 - bound.0)
-        })
-      let align =
-        numbers
-        |> list.drop(1)
-        |> list.fold_until(Left, fn(res, number) {
-          case
-            string.trim(number) == number,
-            string.trim_start(number) == number
-          {
-            True, _ -> list.Continue(res)
-            _, True -> list.Stop(Left)
-            _, _ -> list.Stop(Right)
+  bounds
+  |> list.index_fold(dict.new(), fn(d, bound, i) {
+    let numbers =
+      list.map(lines, fn(line) {
+        string.slice(line, bound.0, bound.1 - bound.0)
+      })
+    let align =
+      numbers
+      |> list.drop(1)
+      |> list.fold_until(Left, fn(res, number) {
+        case
+          string.trim(number) == number,
+          string.trim_start(number) == number
+        {
+          True, _ -> list.Continue(res)
+          _, True -> list.Stop(Left)
+          _, _ -> list.Stop(Right)
+        }
+      })
+    let assert Ok(sign) = list.first(numbers)
+    let sign = case string.trim(sign) {
+      "*" -> Mul
+      "+" -> Sum
+      _ -> panic as sign
+    }
+    dict.insert(
+      d,
+      i,
+      Part2Line(
+        align,
+        sign,
+        numbers |> list.drop(1) |> list.map(string.trim) |> list.reverse,
+      ),
+    )
+  })
+  |> dict.to_list
+  |> list.map(fn(i) { i.1 })
+  |> list.map(fn(line) {
+    let d: Part2Dict = dict.new()
+    let d =
+      line.numbers
+      |> list.fold(d, fn(d, number) {
+        let number_len = string.length(number)
+        string.to_graphemes(number)
+        |> list.index_fold(d, fn(d, digit, index) {
+          let assert Ok(digit) = digit |> int.parse
+          let pos = case line.align {
+            Right -> number_len - index
+            Left -> index
           }
+          dict.insert(
+            d,
+            pos,
+            { dict.get(d, pos) |> result.unwrap(0) } * 10 + digit,
+          )
         })
-      let assert Ok(sign) = list.first(numbers)
-      let sign = case string.trim(sign) {
-        "*" -> Mul
-        "+" -> Sum
-        _ -> panic as sign
-      }
-      dict.insert(
-        d,
-        i,
-        Part2Line(
-          align,
-          sign,
-          numbers |> list.drop(1) |> list.map(string.trim) |> list.reverse,
-        ),
-      )
-    })
-  let part_2 =
-    input_pt_2
-    |> dict.to_list
-    |> list.map(fn(i) { i.1 })
-    |> list.map(fn(line) {
-      let d: Part2Dict = dict.new()
-      let d =
-        line.numbers
-        |> list.fold(d, fn(d, number) {
-          let number_len = string.length(number)
-          string.to_graphemes(number)
-          |> list.index_fold(d, fn(d, digit, index) {
-            let assert Ok(digit) = digit |> int.parse
-            let pos = case line.align {
-              Right -> number_len - index
-              Left -> index
-            }
-            dict.insert(
-              d,
-              pos,
-              { dict.get(d, pos) |> result.unwrap(0) } * 10 + digit,
-            )
-          })
-        })
-      echo #(d, line)
-      let numbers =
-        dict.to_list(d)
-        |> list.map(fn(n) { n.1 })
+      })
+    let numbers =
+      dict.to_list(d)
+      |> list.map(fn(n) { n.1 })
 
-      let r = case line.op {
-        Sum -> int.sum(numbers)
-        Mul -> list.reduce(numbers, int.multiply) |> result.unwrap(0)
-      }
-      r
-    })
-    |> int.sum
-  echo part_2
+    let r = case line.op {
+      Sum -> int.sum(numbers)
+      Mul -> list.reduce(numbers, int.multiply) |> result.unwrap(0)
+    }
+    r
+  })
+  |> int.sum
+  |> int.to_string
+  |> io.println
 }
